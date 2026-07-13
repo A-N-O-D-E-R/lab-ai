@@ -1,0 +1,18 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: toolserver-test-app
+
+# Toolserver configuration (optional - these are the defaults)
+toolserver:
+  enabled: true
+  path: /openapi.json
+  cors:
+    enabled: true
+    allowed-origins:
+      - "*"
+  enhancement:
+    enabled: true
+    context-prefix: "Use this to "
