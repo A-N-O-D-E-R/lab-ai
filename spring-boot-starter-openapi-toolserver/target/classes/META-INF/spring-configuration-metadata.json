@@ -1,0 +1,59 @@
+{
+  "groups": [
+    {
+      "name": "toolserver",
+      "type": "com.toolserver.autoconfigure.ToolserverProperties",
+      "sourceType": "com.toolserver.autoconfigure.ToolserverProperties"
+    },
+    {
+      "name": "toolserver.cors",
+      "type": "com.toolserver.autoconfigure.ToolserverProperties$Cors",
+      "sourceType": "com.toolserver.autoconfigure.ToolserverProperties",
+      "sourceMethod": "public com.toolserver.autoconfigure.ToolserverProperties.Cors getCors() "
+    },
+    {
+      "name": "toolserver.enhancement",
+      "type": "com.toolserver.autoconfigure.ToolserverProperties$Enhancement",
+      "sourceType": "com.toolserver.autoconfigure.ToolserverProperties",
+      "sourceMethod": "public com.toolserver.autoconfigure.ToolserverProperties.Enhancement getEnhancement() "
+    }
+  ],
+  "properties": [
+    {
+      "name": "toolserver.cors.allowed-methods",
+      "type": "java.util.List<java.lang.String>",
+      "sourceType": "com.toolserver.autoconfigure.ToolserverProperties$Cors"
+    },
+    {
+      "name": "toolserver.cors.allowed-origins",
+      "type": "java.util.List<java.lang.String>",
+      "sourceType": "com.toolserver.autoconfigure.ToolserverProperties$Cors"
+    },
+    {
+      "name": "toolserver.cors.enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.toolserver.autoconfigure.ToolserverProperties$Cors"
+    },
+    {
+      "name": "toolserver.enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.toolserver.autoconfigure.ToolserverProperties"
+    },
+    {
+      "name": "toolserver.enhancement.context-prefix",
+      "type": "java.lang.String",
+      "sourceType": "com.toolserver.autoconfigure.ToolserverProperties$Enhancement"
+    },
+    {
+      "name": "toolserver.enhancement.enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.toolserver.autoconfigure.ToolserverProperties$Enhancement"
+    },
+    {
+      "name": "toolserver.path",
+      "type": "java.lang.String",
+      "sourceType": "com.toolserver.autoconfigure.ToolserverProperties"
+    }
+  ],
+  "hints": []
+}
