@@ -1,0 +1,86 @@
+labai:
+  models:
+    labai-bedrock-sonnet:
+      name: labAI Sonnet (Bedrock)
+      description: Claude Sonnet 4.6 served via Amazon Bedrock Converse
+      provider: bedrock
+      model-id: eu.anthropic.claude-sonnet-4-6
+      type: chat
+      prompt: |
+        You are labAI, a helpful, precise and friendly assistant.
+
+    labai-anthropic-opus:
+      name: labAI Opus (Anthropic)
+      description: Claude Opus 4.8 served via the Anthropic API
+      provider: anthropic
+      model-id: claude-opus-4-8
+      type: chat
+      prompt: |
+        You are labAI, a helpful, precise and friendly assistant.
+
+    # Example RAG model: retrieves from an OKF knowledge base before answering.
+    # Set `knowledge-base` to a real vector store id (created via POST /api/v1/vector_stores).
+    labai-rag-gpt4o:
+      name: labAI RAG (OpenAI)
+      description: GPT-4o with OKF knowledge-base retrieval
+      provider: openai
+      model-id: gpt-4o
+      type: chat
+      knowledge-base: vs-REPLACE_WITH_A_REAL_VECTOR_STORE_ID
+      prompt: |
+        You are labAI, a helpful, precise and friendly assistant.
+      prompt-rag: |
+        Answer the question using ONLY the context below. If the context is
+        insufficient, say you don't have enough information.
+
+        Query:
+        {query}
+
+        Context:
+        ---------------------
+        {question_answer_context}
+        ---------------------
+
+    labai-openai-gpt4o:
+      name: labAI GPT-4o (OpenAI)
+      description: GPT-4o served via the OpenAI API
+      provider: openai
+      model-id: gpt-4o
+      type: chat
+      prompt: |
+        You are labAI, a helpful, precise and friendly assistant.
+
+    labai-openai-embed:
+      name: labAI Embeddings (OpenAI)
+      description: text-embedding-3-small via the OpenAI API
+      provider: openai
+      model-id: text-embedding-3-small
+      type: embedding
+
+    labai-bedrock-embed:
+      name: labAI Embeddings (Bedrock)
+      description: Amazon Titan Text Embeddings v2 via Bedrock
+      provider: bedrock
+      model-id: amazon.titan-embed-text-v2:0
+      type: embedding
+
+    labai-openai-dalle:
+      name: labAI Images (OpenAI)
+      description: DALL·E 3 image generation via the OpenAI API
+      provider: openai
+      model-id: dall-e-3
+      type: image
+
+    labai-openai-whisper:
+      name: labAI Transcription (OpenAI)
+      description: Whisper audio transcription via the OpenAI API
+      provider: openai
+      model-id: whisper-1
+      type: transcription
+
+    labai-openai-moderation:
+      name: labAI Moderation (OpenAI)
+      description: Text moderation via the OpenAI API
+      provider: openai
+      model-id: omni-moderation-latest
+      type: moderation

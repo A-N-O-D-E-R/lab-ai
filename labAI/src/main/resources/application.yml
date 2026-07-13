@@ -1,0 +1,86 @@
+logging:
+  level:
+    '[org.springframework.ai]': INFO
+    '[bio.anode.ai]': DEBUG
+
+labai:
+  # Map of API key -> username. Populate per environment (see application-local.yml).
+  # (left unset here; defaults to an empty map)
+
+  # Generic tools exposed to every model (empty by default in the stripped gateway).
+  # global-tools: []
+
+  # Knowledge base (OKF ingestion + RAG). The embedding model is pinned so ingestion and retrieval
+  # are deterministic; `dimensions` MUST match it and is fixed once the pgvector table is created.
+  knowledge:
+    embedding-model: labai-openai-embed   # registry model id; text-embedding-3-small (1536 dims)
+    dimensions: 1536
+    vector-table-name: okf_vectors
+    default-top-k: 4
+    default-threshold: 0.5
+    chunk-size: 800
+    min-chunk-size-chars: 350
+
+  # Fallback model configuration when a requested model id is not in the registry.
+  default-model:
+    provider: bedrock
+    model-id: eu.anthropic.claude-sonnet-4-6
+    prompt: |
+      You are labAI, a helpful, precise and friendly assistant.
+
+  # Canned short-circuit replies (generic examples).
+  auto-responses:
+    - name: greeting
+      enabled: true
+      triggers:
+        - hello
+        - hi
+        - hey
+      response: |
+        Hello, I am labAI. How can I help you today?
+
+spring:
+  application:
+    name: labAI
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.security.autoconfigure.ReactiveUserDetailsServiceAutoConfiguration
+  config:
+    import: classpath:models.yaml
+  threads:
+    virtual:
+      enabled: true
+  http:
+    codecs:
+      max-in-memory-size: 80MB
+  webflux:
+    problemdetails:
+      enabled: true
+  web:
+    error:
+      include-message: always
+
+  ai:
+    # NOTE: the provider selector properties (spring.ai.model.chat / .embedding / ...) are left
+    # UNSET on purpose. Each provider auto-config uses matchIfMissing=true, so all providers on the
+    # classpath contribute their ChatModel/EmbeddingModel/... beans simultaneously. ChatConfig then
+    # builds one ChatClient per available provider and ChatClientRegistry dispatches per model id.
+    bedrock:
+      aws:
+        region: ${BEDROCK_REGION:${AWS_REGION:eu-west-3}}
+      converse:
+        chat:
+          enabled: true
+          temperature: 0.2
+          max-tokens: 8192
+    anthropic:
+      api-key: ${ANTHROPIC_API_KEY:}
+      chat:
+        options:
+          model: claude-sonnet-4-6
+          max-tokens: 8192
+    openai:
+      api-key: ${OPENAI_API_KEY:}
+      chat:
+        options:
+          model: gpt-4o

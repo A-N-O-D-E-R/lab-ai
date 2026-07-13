@@ -1,0 +1,13 @@
+labai:
+  apikeys:
+    magic-key: local-dev
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5440/labai
+    username: myuser
+    password: secret
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true

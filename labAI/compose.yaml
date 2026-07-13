@@ -1,0 +1,40 @@
+services:
+
+  postgres:
+    image: 'pgvector/pgvector:pg17'
+    environment:
+      - 'POSTGRES_DB=labai'
+      - 'POSTGRES_USER=myuser'
+      - 'POSTGRES_PASSWORD=secret'
+    ports:
+      - '5440:5432'
+
+  webui:
+    image: ghcr.io/open-webui/open-webui:v0.10.2
+    environment:
+      - 'AUDIO_TTS_ENGINE=openai'
+      - 'BYPASS_MODEL_ACCESS_CONTROL=true'
+      - 'DATABASE_URL=postgresql://myuser:secret@postgres:5432/labai'
+      - 'DEFAULT_LOCALE=en'
+      - 'ENABLE_AUTOCOMPLETE_GENERATION=false'
+      - 'ENABLE_COMMUNITY_SHARING=false'
+      - 'ENABLE_EVALUATION_ARENA_MODELS=false'
+      - 'ENABLE_FOLLOW_UP_GENERATION=true'
+      - 'ENABLE_FORWARD_USER_INFO_HEADERS=true'
+      - 'ENABLE_MESSAGE_RATING=true'
+      - 'ENABLE_OLLAMA_API=false'
+      - 'ENABLE_OPENAI_API_PASSTHROUGH=true'
+      - 'ENABLE_PERSISTENT_CONFIG=true'
+      - 'ENABLE_WEBSOCKET_SUPPORT=true'
+      - 'ENV=prod'
+      - 'OPENAI_API_BASE_URL=http://host.docker.internal:8080/api/v1'
+      - 'OPENAI_API_KEY=magic-key'
+      - 'USER_PERMISSIONS_WORKSPACE_MODELS_ACCESS=true'
+      - 'USER_PERMISSIONS_CHAT_DELETE=true'
+      - 'USER_PERMISSIONS_CHAT_EDIT=false'
+      - 'USER_PERMISSIONS_CHAT_FILE_UPLOAD=true'
+      - 'WEBUI_NAME=labAI'
+      - 'WEBUI_AUTH=false'
+      - 'WEBUI_SECRET_KEY='
+    ports:
+      - '3000:8080'
