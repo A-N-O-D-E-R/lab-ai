@@ -41,6 +41,22 @@ labai:
         {question_answer_context}
         ---------------------
 
+    # Autonomous agent run by the Claude Code CLI. No built-in tools (no shell, no file access);
+    # lab tools arrive through MCP (Phase 4).
+    labai-agent:
+      name: labAI Agent (Claude Code)
+      description: Claude Code autonomous agent
+      provider: claude-code
+      model-id: sonnet
+      type: chat
+      prompt: |
+        You are labAI, the lab assistant. Be precise and concise.
+      agent:
+        builtin-tools: []
+        timeout: 5m
+        max-turns: 20
+        max-budget-usd: 1.00
+
     labai-openai-gpt4o:
       name: labAI GPT-4o (OpenAI)
       description: GPT-4o served via the OpenAI API

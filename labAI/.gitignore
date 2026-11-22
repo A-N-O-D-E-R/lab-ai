@@ -50,3 +50,6 @@ Thumbs.db
 
 .env
 bdd.h2.*
+
+# Claude Code agent workspaces (labai.agent.workspace-root)
+workspaces/

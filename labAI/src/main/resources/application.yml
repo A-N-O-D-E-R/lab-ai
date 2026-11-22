@@ -21,6 +21,21 @@ labai:
     chunk-size: 800
     min-chunk-size-chars: 350
 
+  # Claude Code agents (models with `provider: claude-code`). Credentials come from the environment
+  # only; OAuth is preferred. The CLI process never inherits the variables listed in scrub-env.
+  agent:
+    workspace-root: ${LABAI_AGENT_WORKSPACES:./workspaces}
+    oauth-token: ${CLAUDE_CODE_OAUTH_TOKEN:}
+    api-key: ${LABAI_AGENT_ANTHROPIC_API_KEY:}
+    scrub-env:
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+      - AWS_SESSION_TOKEN
+      - OPENAI_API_KEY
+      - SPRING_DATASOURCE_PASSWORD
+      - SPRING_DATASOURCE_USERNAME
+      - SPRING_DATASOURCE_URL
+
   # Fallback model configuration when a requested model id is not in the registry.
   default-model:
     provider: bedrock
@@ -79,6 +94,11 @@ spring:
         options:
           model: claude-sonnet-4-6
           max-tokens: 8192
+    claude-code:
+      executable: ${CLAUDE_EXECUTABLE:claude}
+      # Headless default; LabAgentService also forces dontAsk on every run.
+      permission-mode: dontAsk
+      timeout: 10m
     openai:
       api-key: ${OPENAI_API_KEY:}
       chat:
