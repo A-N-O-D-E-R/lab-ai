@@ -2,6 +2,8 @@ package bio.anode.ai.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.math.BigDecimal;
+import java.time.Duration;
 import java.util.*;
 
 /**
@@ -24,9 +26,9 @@ public record LabaiProperties(ModelProperty defaultModel,
         apikeys = apikeys == null ? Map.of() : apikeys;
     }
 
-    /** Supported upstream LLM providers. */
+    /** Supported upstream LLM providers. {@code CLAUDE_CODE} models run as autonomous Claude Code agents. */
     public enum Provider {
-        BEDROCK, ANTHROPIC, OPENAI
+        BEDROCK, ANTHROPIC, OPENAI, CLAUDE_CODE
     }
 
     /** Kind of model, used to route to the correct Spring AI model abstraction. */
@@ -70,6 +72,11 @@ public record LabaiProperties(ModelProperty defaultModel,
         return model(appName).knowledgeBase();
     }
 
+    /** Agent settings of a {@code claude-code} model; never null (defaults when the model has no {@code agent} block). */
+    public AgentProfile getAgent(String appName) {
+        return Optional.ofNullable(model(appName).agent()).orElseGet(AgentProfile::defaults);
+    }
+
     public Set<String> getTools(String appName) {
         var model = model(appName);
         return Optional.ofNullable(model.tools()).orElseGet(Collections::emptySet);
@@ -86,10 +93,32 @@ public record LabaiProperties(ModelProperty defaultModel,
                                 String prompt,
                                 String promptRag,
                                 String knowledgeBase,
-                                Set<String> tools) {
+                                Set<String> tools,
+                                AgentProfile agent) {
 
         public ModelType type() {
             return type == null ? ModelType.CHAT : type;
+        }
+    }
+
+    /**
+     * Claude Code agent settings of a {@code claude-code} model.
+     *
+     * @param builtinTools Claude Code built-in tools; empty (the default) disables all of them
+     * @param timeout      maximum duration of one run
+     * @param maxTurns     maximum agent turns per run
+     * @param maxBudgetUsd maximum API spend per run
+     */
+    public record AgentProfile(List<String> builtinTools, Duration timeout, Integer maxTurns, BigDecimal maxBudgetUsd) {
+
+        public AgentProfile {
+            builtinTools = builtinTools == null ? List.of() : List.copyOf(builtinTools);
+            timeout = timeout == null ? Duration.ofMinutes(5) : timeout;
+            maxTurns = maxTurns == null ? 20 : maxTurns;
+        }
+
+        public static AgentProfile defaults() {
+            return new AgentProfile(null, null, null, null);
         }
     }
 

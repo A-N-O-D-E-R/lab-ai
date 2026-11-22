@@ -1,5 +1,6 @@
 package bio.anode.ai.support;
 
+import bio.anode.ai.agent.AgentException;
 import bio.anode.ai.controller.model.common.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -35,6 +36,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(ErrorResponse.of(ex.getMessage(), "authentication_error", null));
+    }
+
+    @ExceptionHandler(AgentException.class)
+    public ResponseEntity<ErrorResponse> handleAgent(AgentException ex) {
+        log.warn("Agent run failed ({}): {}", ex.reason(), ex.getMessage());
+        return ResponseEntity.status(ex.reason().status)
+                .body(ErrorResponse.of(ex.getMessage(), ex.reason().type, null));
     }
 
     @ExceptionHandler(ResponseStatusException.class)

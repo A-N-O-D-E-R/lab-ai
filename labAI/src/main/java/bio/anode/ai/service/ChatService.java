@@ -1,5 +1,6 @@
 package bio.anode.ai.service;
 
+import bio.anode.ai.agent.LabAgentService;
 import bio.anode.ai.chat.ChatClientRegistry;
 import bio.anode.ai.config.LabaiProperties;
 import bio.anode.ai.controller.model.chat.ChatCompletionRequest;
@@ -18,11 +19,15 @@ import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.resolution.ToolCallbackResolver;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -36,6 +41,7 @@ public class ChatService {
     private final ChatCompletionResponseMapper mapper;
     private final AutoResponder autoResponder;
     private final bio.anode.ai.chat.QaAdvisorFactory qaAdvisorFactory;
+    private final LabAgentService labAgentService;
 
     private ChatClient.ChatClientRequestSpec getClient(
             String modelName,
@@ -65,8 +71,10 @@ public class ChatService {
         var userMessage = getUserMessage(request);
         return autoResponder.detect(userMessage.getText())
                 .map(autoReply -> buildAutoReply(modelName, autoReply))
-                .orElseGet(() -> mapper.toWeb(modelName,
-                        getClient(modelName, sessionId, userMessage).call().chatResponse(), false));
+                .orElseGet(() -> isAgent(modelName)
+                        ? buildReply(modelName, runAgent(request), false)
+                        : mapper.toWeb(modelName,
+                                getClient(modelName, sessionId, userMessage).call().chatResponse(), false));
     }
 
     public Flux<ChatCompletionResponse> chatCompletionStream(ChatCompletionRequest request, String sessionId) {
@@ -74,8 +82,13 @@ public class ChatService {
         var userMessage = getUserMessage(request);
         return autoResponder.detect(userMessage.getText())
                 .map(autoReply -> Flux.just(buildAutoReply(modelName, autoReply)))
-                .orElseGet(() -> getClient(modelName, sessionId, userMessage).stream().chatResponse()
-                        .map(c -> mapper.toWeb(modelName, c, true)));
+                .orElseGet(() -> isAgent(modelName)
+                        // The agent returns one final answer: emitted as a single chunk, off the event loop.
+                        ? Mono.fromCallable(() -> buildReply(modelName, runAgent(request), true))
+                                .subscribeOn(Schedulers.boundedElastic())
+                                .flux()
+                        : getClient(modelName, sessionId, userMessage).stream().chatResponse()
+                                .map(c -> mapper.toWeb(modelName, c, true)));
     }
 
     private ChatCompletionResponse buildAutoReply(String application, String reply) {
@@ -90,6 +103,35 @@ public class ChatService {
                 null,
                 true
         );
+    }
+
+    private boolean isAgent(String modelName) {
+        return labaiProperties.getProvider(modelName) == LabaiProperties.Provider.CLAUDE_CODE;
+    }
+
+    private String runAgent(ChatCompletionRequest request) {
+        return labAgentService.run(request.model(), toAgentPrompt(request.messages())).text();
+    }
+
+    /**
+     * Claude Code owns its own conversation state, so it is not fed through Spring AI chat memory. Until
+     * sessions exist (Phase 5) the OpenAI history is flattened into one prompt.
+     */
+    static String toAgentPrompt(List<ChatCompletionRequest.ChatMessage> messages) {
+        if (messages.size() == 1) {
+            return messages.getFirst().content();
+        }
+        return messages.stream()
+                .map(m -> StringUtils.capitalize(m.role()) + ":\n" + m.content())
+                .collect(Collectors.joining("\n\n"));
+    }
+
+    private static ChatCompletionResponse buildReply(String application, String text, boolean isStream) {
+        var message = new ChatCompletionResponse.Message("assistant", text, null);
+        var choice = isStream
+                ? new ChatCompletionResponse.Choice("stop", 0, null, message)
+                : new ChatCompletionResponse.Choice("stop", 0, message);
+        return new ChatCompletionResponse(null, application, List.of(choice), null, isStream);
     }
 
     private Message getUserMessage(ChatCompletionRequest request) {
