@@ -11,13 +11,35 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.toolserver</groupId>
+    <groupId>io.github.a-n-o-d-e-r</groupId>
     <artifactId>spring-boot-starter-openapi-toolserver</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
     <name>Spring Boot OpenAPI Toolserver Starter</name>
     <description>Spring Boot starter that transforms any API into an OpenAPI toolserver for AI agents</description>
+
+    <url>https://github.com/A-N-O-D-E-R/lab-ai</url>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>A-N-O-D-E-R</id>
+            <name>A-N-O-D-E-R</name>
+            <url>https://github.com/A-N-O-D-E-R</url>
+        </developer>
+    </developers>
+
+    <scm>
+        <url>https://github.com/A-N-O-D-E-R/lab-ai</url>
+        <connection>scm:git:https://github.com/A-N-O-D-E-R/lab-ai.git</connection>
+    </scm>
 
     <properties>
         <java.version>17</java.version>
@@ -72,4 +94,63 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>central</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals><goal>jar-no-fork</goal></goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals><goal>jar</goal></goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>3.2.4</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals><goal>sign</goal></goals>
+                                <configuration>
+                                    <gpgArguments>
+                                        <arg>--pinentry-mode</arg>
+                                        <arg>loopback</arg>
+                                    </gpgArguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>0.11.0</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <publishingServerId>central</publishingServerId>
+                            <autoPublish>true</autoPublish>
+                            <waitUntil>published</waitUntil>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

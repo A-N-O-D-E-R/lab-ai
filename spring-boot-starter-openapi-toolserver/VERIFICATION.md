@@ -77,7 +77,7 @@ Adding just one dependency transforms any Spring Boot API into a toolserver:
 
 ```xml
 <dependency>
-    <groupId>com.toolserver</groupId>
+    <groupId>io.github.a-n-o-d-e-r</groupId>
     <artifactId>spring-boot-starter-openapi-toolserver</artifactId>
     <version>1.0.0</version>
 </dependency>

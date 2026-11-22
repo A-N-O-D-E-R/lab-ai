@@ -1,0 +1,52 @@
+name: Docker Hub
+
+on:
+  push:
+    branches: [master]
+    paths: ['labAI/**', '.github/workflows/docker.yml']
+  workflow_dispatch:
+
+env:
+  IMAGE_NAME: anoder/labai
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # labAI depends on com.anode.ai:spring-ai-claude 0.1.0-SNAPSHOT, not published anywhere yet
+      - uses: actions/checkout@v4
+        with:
+          repository: A-N-O-D-E-R/spring-ai-claude-code-starter
+          path: spring-ai-claude-code-starter
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+
+      - name: Install spring-ai-claude
+        run: mvn -B -q install -DskipTests -f spring-ai-claude-code-starter/pom.xml
+
+      - name: Build jar
+        working-directory: labAI
+        run: |
+          ./mvnw -B package
+          cp target/labai-*.jar app.jar
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: labAI
+          push: true
+          tags: |
+            ${{ env.IMAGE_NAME }}:latest
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}

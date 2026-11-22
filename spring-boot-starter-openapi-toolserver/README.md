@@ -22,7 +22,7 @@ An OpenAPI toolserver is an HTTP API that exposes its functionality through a st
 **Maven:**
 ```xml
 <dependency>
-    <groupId>com.toolserver</groupId>
+    <groupId>io.github.a-n-o-d-e-r</groupId>
     <artifactId>spring-boot-starter-openapi-toolserver</artifactId>
     <version>1.0.0</version>
 </dependency>
@@ -30,7 +30,7 @@ An OpenAPI toolserver is an HTTP API that exposes its functionality through a st
 
 **Gradle:**
 ```gradle
-implementation 'com.toolserver:spring-boot-starter-openapi-toolserver:1.0.0'
+implementation 'io.github.a-n-o-d-e-r:spring-boot-starter-openapi-toolserver:1.0.0'
 ```
 
 ### 2. Run Your Application
